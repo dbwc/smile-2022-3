@@ -3,7 +3,8 @@ import sqlite3
 from sqlite3 import Error
 
 app = Flask(__name__)
-DATABASE = "smile.db"
+DATABASE = "C:/Users/d.benseman/OneDrive - Wellington College/13DTS/Python2022/13-3/Smile/smile.db"
+
 
 def create_connection(db_file):
     """
@@ -11,6 +12,7 @@ def create_connection(db_file):
     parameter: name of the database file
     returns: a connection to the file
     """
+    print(db_file)
     try:
         connection = sqlite3.connect(db_file)
         return connection
@@ -32,6 +34,7 @@ def render_menu_page():
     cur = con.cursor()     # Creates a cursor to write the query
     cur.execute(query)     # Runs the query
     product_list = cur.fetchall()
+    print(product_list)
     con.close()
 
     return render_template('menu.html', products=product_list)
@@ -42,4 +45,14 @@ def render_contact_page():
     return render_template('contact.html')
 
 
-app.run(host='0.0.0.0', debug=True)
+@app.route('/login', methods=['GET', 'POST'])
+def render_login_page():
+    return render_template('login.html')
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def render_signup_page():
+    return render_template('signup.html')
+
+
+app.run(host='127.0.0.1', debug=True)
