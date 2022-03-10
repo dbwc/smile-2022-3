@@ -12,7 +12,6 @@ def create_connection(db_file):
     parameter: name of the database file
     returns: a connection to the file
     """
-    print(db_file)
     try:
         connection = sqlite3.connect(db_file)
         return connection
@@ -47,6 +46,25 @@ def render_contact_page():
 
 @app.route('/login', methods=['GET', 'POST'])
 def render_login_page():
+    if request.method == 'POST':
+        print(request.form)
+        email = request.form.get('email').lower().strip()
+        password = request.form.get('password')
+
+        con = create_connection(DATABASE)
+        query = "SELECT id, fname FROM customer WHERE email=? AND password=?"
+        cur = con.cursor()
+        cur.execute(query, (email, password))
+        user_data = cur.fetchall()
+        con.close()
+
+        try:
+            user_id = user_data[0][0]
+            first_name = user_data[0][1]
+        except indexError:
+            return redirect("login?error=Email+or+password+is+incorrect")
+        print(user_id, first_name)
+
     return render_template('login.html')
 
 
@@ -77,7 +95,10 @@ def render_signup_page():
         con.close()
         return redirect('/login')
 
-    return render_template('signup.html')
+    error = request.args.get('error')
+    if error == None:
+        error = ""
+    return render_template('signup.html', error=error)
 
 
 app.run(host='127.0.0.1', debug=True)
